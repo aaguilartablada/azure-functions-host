@@ -110,7 +110,7 @@ namespace Microsoft.Azure.WebJobs.Script.Workers
                 if (!userExecute || !groupExecute || !otherExecute)
                 {
                     _workerProcessLogger.LogDebug("Assigning execute permissions to file: {filePath}", filePath);
-                    fileInfo.FileAccessPermissions |= FileAccessPermissions.UserExecute |
+                    fileInfo.FileAccessPermissions |= //FileAccessPermissions.UserExecute |
                                                       FileAccessPermissions.GroupExecute |
                                                       FileAccessPermissions.OtherExecute;
                 }
