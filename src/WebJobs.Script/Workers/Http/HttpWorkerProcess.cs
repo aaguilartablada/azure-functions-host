@@ -67,7 +67,7 @@ namespace Microsoft.Azure.WebJobs.Script.Workers.Http
             return workerProcess;
         }
 
-        private void AssignUserExecutePermissionsIfNotExists(string filePath)
+        private void AssignUserExecutePermissionsIfNotExists2(string filePath)
         {
             try
             {

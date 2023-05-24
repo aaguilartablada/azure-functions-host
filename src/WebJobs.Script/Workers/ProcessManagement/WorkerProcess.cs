@@ -13,6 +13,7 @@ using Microsoft.Azure.WebJobs.Script.Diagnostics;
 using Microsoft.Azure.WebJobs.Script.Eventing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Mono.Unix;
 
 namespace Microsoft.Azure.WebJobs.Script.Workers
 {
@@ -90,6 +91,25 @@ namespace Microsoft.Azure.WebJobs.Script.Workers
                     _workerProcessLogger.LogError(ex, $"Failed to start Worker Channel. Process fileName: {Process.StartInfo.FileName}");
                     return Task.FromException(ex);
                 }
+            }
+        }
+
+        internal void AssignUserExecutePermissionsIfNotExists(string filePath)
+        {
+            try
+            {
+                UnixFileInfo fileInfo = new UnixFileInfo(filePath);
+                if (!fileInfo.FileAccessPermissions.HasFlag(FileAccessPermissions.UserExecute))
+                {
+                    _workerProcessLogger.LogDebug("Assigning execute permissions to file: {filePath}", filePath);
+                    fileInfo.FileAccessPermissions |= FileAccessPermissions.UserExecute |
+                                                      FileAccessPermissions.GroupExecute |
+                                                      FileAccessPermissions.OtherExecute;
+                }
+            }
+            catch (Exception ex)
+            {
+                _workerProcessLogger.LogWarning(ex, "Error while assigning execute permission.");
             }
         }
 
