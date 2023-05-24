@@ -99,7 +99,15 @@ namespace Microsoft.Azure.WebJobs.Script.Workers
             try
             {
                 UnixFileInfo fileInfo = new UnixFileInfo(filePath);
-                if (!fileInfo.FileAccessPermissions.HasFlag(FileAccessPermissions.UserExecute))
+
+                var userExecute = fileInfo.FileAccessPermissions.HasFlag(FileAccessPermissions.UserExecute);
+                var groupExecute = fileInfo.FileAccessPermissions.HasFlag(FileAccessPermissions.GroupExecute);
+                var otherExecute = fileInfo.FileAccessPermissions.HasFlag(FileAccessPermissions.OtherExecute);
+
+                _workerProcessLogger.LogDebug($"FileAccessPermissions userExecute: {userExecute}, groupExecute:{groupExecute},otherExecute:{otherExecute}");
+
+                //if (!fileInfo.FileAccessPermissions.HasFlag(FileAccessPermissions.UserExecute))
+                if (!userExecute || !groupExecute || !otherExecute)
                 {
                     _workerProcessLogger.LogDebug("Assigning execute permissions to file: {filePath}", filePath);
                     fileInfo.FileAccessPermissions |= FileAccessPermissions.UserExecute |
