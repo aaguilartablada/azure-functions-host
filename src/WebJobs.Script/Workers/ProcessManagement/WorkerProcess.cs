@@ -13,7 +13,6 @@ using Microsoft.Azure.WebJobs.Script.Diagnostics;
 using Microsoft.Azure.WebJobs.Script.Eventing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Mono.Unix;
 
 namespace Microsoft.Azure.WebJobs.Script.Workers
 {
