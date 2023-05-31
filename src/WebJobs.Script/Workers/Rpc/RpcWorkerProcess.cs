@@ -64,17 +64,7 @@ namespace Microsoft.Azure.WebJobs.Script.Workers.Rpc
             {
                 workerContext.EnvironmentVariables[pair.Key] = pair.Value;
             }
-            var workerProcess = _processFactory.CreateWorkerProcess(workerContext);
-            //if (_environment.IsAnyLinuxConsumption())
-            //{
-            //    _workerProcessLogger?.LogInformation("IsAnyLinuxConsumption true. Calling AssignUserExecutePermissionsIfNotExists");
-            //   // AssignUserExecutePermissionsIfNotExists(workerProcess.StartInfo.FileName);
-            //}
-            //else
-            //{
-            //    _workerProcessLogger?.LogInformation("IsAnyLinuxConsumption false");
-            //}
-            return workerProcess;
+            return _processFactory.CreateWorkerProcess(workerContext);
         }
 
         internal override void HandleWorkerProcessExitError(WorkerProcessExitException rpcWorkerProcessExitException)
