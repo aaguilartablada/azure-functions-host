@@ -116,6 +116,10 @@ namespace Microsoft.Azure.WebJobs.Script.Workers.Rpc
         public async Task SpecializeAsync()
         {
             _logger.LogInformation("Starting language worker channel specialization");
+
+            var rtvEnvVar = _environment.GetEnvironmentVariable(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName);
+            _logger.LogInformation($"SpecializeAsync {RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName} env var value: {rtvEnvVar}");
+
             _workerRuntime = _environment.GetEnvironmentVariable(RpcWorkerConstants.FunctionWorkerRuntimeSettingName);
 
             IRpcWorkerChannel rpcWorkerChannel = await GetChannelAsync(_workerRuntime);

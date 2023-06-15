@@ -59,7 +59,17 @@ namespace Microsoft.Azure.WebJobs.Script.Workers.Rpc
             var workerContext = new RpcWorkerContext(Guid.NewGuid().ToString(), RpcWorkerConstants.DefaultMaxMessageLengthBytes, _workerId, _workerProcessArguments, _scriptRootPath, _serverUri);
             workerContext.EnvironmentVariables.Add(WorkerConstants.FunctionsWorkerDirectorySettingName, _workerDirectory);
             workerContext.EnvironmentVariables.Add(WorkerConstants.FunctionsApplicationDirectorySettingName, _scriptRootPath);
-            workerContext.EnvironmentVariables.Add(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName, _environment.GetEnvironmentVariable(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName));
+
+            var runtimeVersionEnvVarValue = _environment.GetEnvironmentVariable(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName);
+            _workerProcessLogger?.LogInformation($"CreateWorkerProcess: runtimeVersionEnvVarValue from IEnvironment:{runtimeVersionEnvVarValue}");
+
+            workerContext.EnvironmentVariables.Add(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName, runtimeVersionEnvVarValue);
+
+            if (_hostingConfigOptions.Value.Features.TryGetValue(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName, out var featureValue))
+            {
+                _workerProcessLogger?.LogInformation($"CreateWorkerProcess:{RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName} from _hostingConfigOptions.Value.Features:{featureValue}");
+            }
+
             foreach (var pair in _hostingConfigOptions.Value.Features)
             {
                 workerContext.EnvironmentVariables[pair.Key] = pair.Value;
