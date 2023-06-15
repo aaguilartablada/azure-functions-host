@@ -61,7 +61,7 @@ namespace Microsoft.Azure.WebJobs.Script.Workers.Rpc
             workerContext.EnvironmentVariables.Add(WorkerConstants.FunctionsApplicationDirectorySettingName, _scriptRootPath);
 
             var runtimeVersionEnvVarValue = _environment.GetEnvironmentVariable(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName);
-            _workerProcessLogger?.LogInformation($"CreateWorkerProcess: runtimeVersionEnvVarValue from IEnvironment:{runtimeVersionEnvVarValue}");
+            _workerProcessLogger?.LogInformation($"CreateWorkerProcess: runtimeVersionEnvVarValue from IEnvironment.GetEnvironmentVariable:{runtimeVersionEnvVarValue}");
 
             workerContext.EnvironmentVariables.Add(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName, runtimeVersionEnvVarValue);
 
