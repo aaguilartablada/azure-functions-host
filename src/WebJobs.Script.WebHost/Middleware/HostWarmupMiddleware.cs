@@ -77,6 +77,8 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Middleware
                 _jitTraceHasRun = true;
             }
 
+            _logger.LogInformation(new EventId(100, "PreJit"), $"Inside WarmupInvoke");
+
             ReadRuntimeAssemblyFiles();
 
             await HostWarmupAsync(httpContext.Request);
@@ -95,9 +97,9 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Middleware
         {
             try
             {
-                string[] assmblies = Directory.GetFiles(_assemblyLocalPath, "*.dll", SearchOption.TopDirectoryOnly);
-                string[] exes = GetExecutables(_assemblyLocalPath);
-                string[] allFiles = exes.Length == 0 ? assmblies : assmblies.Concat(exes).ToArray();
+                var assemblies = Directory.GetFiles(_assemblyLocalPath, "*.dll", SearchOption.TopDirectoryOnly);
+                var exes = GetExecutables(_assemblyLocalPath);
+                var allFiles = exes.Length == 0 ? assemblies : assemblies.Concat(exes).ToArray();
 
                 // Read File content in 4K chunks
                 int maxBuffer = 4 * 1024;
@@ -108,7 +110,7 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Middleware
                     // Read file content to avoid disk reads during specialization. This is only to page-in bytes.
                     ReadFileInChunks(file, chunk, maxBuffer, random);
                 }
-                _logger.LogDebug(new EventId(100, nameof(ReadRuntimeAssemblyFiles)), "Number of files read: '{allFilesCount}'. AssemblyLocalPath: '{assemblyLocalPath}' ", allFiles.Count(), _assemblyLocalPath);
+                _logger.LogDebug(new EventId(100, nameof(ReadRuntimeAssemblyFiles)), "Number of files read: '{allFilesCount}'. AssemblyLocalPath: '{assemblyLocalPath}' ", allFiles.Length, _assemblyLocalPath);
             }
             catch (Exception ex)
             {
@@ -118,24 +120,28 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Middleware
 
         private string[] GetExecutables(string assemblyLocalPath)
         {
-            var executableName = string.Empty;
+            var workerDir = RpcWorkerConfigFactory.GetDefaultWorkersDirectory(Directory.Exists);
 
             try
             {
                 // dotnet-isolated native host executable.
-                string dotnetIsolatedWorkerPath = Path.Combine(assemblyLocalPath, RpcWorkerConstants.DefaultWorkersDirectoryName, RpcWorkerConstants.DotNetIsolatedLanguageWorkerName);
-                executableName = OperatingSystem.IsWindows() ? $"{RpcWorkerConstants.DotNetIsolatedNativeWorkerName}.exe" : RpcWorkerConstants.DotNetIsolatedNativeWorkerName;
+                var dotnetIsolatedWorkerPath = Path.Combine(workerDir, RpcWorkerConstants.DotNetIsolatedLanguageWorkerName);
+                var executableName = OperatingSystem.IsWindows() ? $"{RpcWorkerConstants.DotNetIsolatedNativeWorkerName}.exe" : RpcWorkerConstants.DotNetIsolatedNativeWorkerName;
                 var fullPath = Path.Combine(dotnetIsolatedWorkerPath, "bin", executableName);
+                var fileExist = File.Exists(fullPath);
 
-                if (File.Exists(fullPath))
+                _logger.LogInformation(new EventId(100, "PreJit"), $"Inside GetExecutables. fullPath:{fullPath}, fileExist:{fileExist}");
+
+                if (fileExist)
                 {
-                    _logger.LogInformation($"Will include {fullPath} when reading runtime files");
-                    return new string[] { fullPath };
+                    _logger.LogInformation(new EventId(100, "PreJit"), $"Will include functionsnethost when reading runtime files");
+
+                    return new[] { fullPath };
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(new EventId(100, nameof(ReadFileInChunks)), ex, "Finding runtime executables failed. AssemblyLocalPath: '{assemblyLocalPath}',executableName:{executableName}", assemblyLocalPath, executableName);
+                _logger.LogError(new EventId(100, nameof(ReadFileInChunks)), ex, "Finding runtime executables failed. AssemblyLocalPath: '{workerDir}'", workerDir);
             }
 
             return Array.Empty<string>();
