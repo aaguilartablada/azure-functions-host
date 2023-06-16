@@ -95,7 +95,10 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Middleware
         {
             try
             {
-                string[] allFiles = Directory.GetFiles(_assemblyLocalPath, "*.dll", SearchOption.TopDirectoryOnly);
+                string[] assmblies = Directory.GetFiles(_assemblyLocalPath, "*.dll", SearchOption.TopDirectoryOnly);
+                string[] exes = GetExecutables(_assemblyLocalPath);
+                string[] allFiles = exes.Length == 0 ? assmblies : assmblies.Concat(exes).ToArray();
+
                 // Read File content in 4K chunks
                 int maxBuffer = 4 * 1024;
                 byte[] chunk = new byte[maxBuffer];
@@ -111,6 +114,31 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Middleware
             {
                 _logger.LogError(new EventId(100, nameof(ReadRuntimeAssemblyFiles)), ex, "Reading ReadRuntimeAssemblyFiles failed. AssemblyLocalPath: '{assemblyLocalPath}'", _assemblyLocalPath);
             }
+        }
+
+        private string[] GetExecutables(string assemblyLocalPath)
+        {
+            var executableName = string.Empty;
+
+            try
+            {
+                // dotnet-isolated native host executable.
+                string dotnetIsolatedWorkerPath = Path.Combine(assemblyLocalPath, RpcWorkerConstants.DefaultWorkersDirectoryName, RpcWorkerConstants.DotNetIsolatedLanguageWorkerName);
+                executableName = OperatingSystem.IsWindows() ? $"{RpcWorkerConstants.DotNetIsolatedNativeWorkerName}.exe" : RpcWorkerConstants.DotNetIsolatedNativeWorkerName;
+                var fullPath = Path.Combine(dotnetIsolatedWorkerPath, "bin", executableName);
+
+                if (File.Exists(fullPath))
+                {
+                    _logger.LogInformation($"Will include {fullPath} when reading runtime files");
+                    return new string[] { fullPath };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(new EventId(100, nameof(ReadFileInChunks)), ex, "Finding runtime executables failed. AssemblyLocalPath: '{assemblyLocalPath}',executableName:{executableName}", assemblyLocalPath, executableName);
+            }
+
+            return Array.Empty<string>();
         }
 
         private void ReadFileInChunks(string file, byte[] chunk, int maxBuffer, Random random)
