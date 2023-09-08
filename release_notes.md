@@ -11,3 +11,8 @@
 - Update PowerShell 7.4 Worker Version to [4.0.2975](https://github.com/Azure/azure-functions-powershell-worker/releases/tag/v4.0.2975)
 - Update PowerShell 7.2 Worker Version to [4.0.2974](https://github.com/Azure/azure-functions-powershell-worker/releases/tag/v4.0.2974)
 - Update PowerShell 7.0 Worker Version to [4.0.2973](https://github.com/Azure/azure-functions-powershell-worker/releases/tag/v4.0.2973)
+- Bug fix: Do not restart a worker channel when an API request is made to update or get the function metadata
+  - This fixes an issue where when testing a function app in the portal, and worker indexing is enabled, the host creates a new worker channel
+    that does not get properly initialized; the host will now just return the function metadata
+- Bug fix: Fix an issue where host creates a new worker channel that does not get properly initialized
+  - The host will now restart if it's running and there are no channels available
