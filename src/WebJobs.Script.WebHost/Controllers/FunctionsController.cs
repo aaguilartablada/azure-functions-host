@@ -51,7 +51,10 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Controllers
         public async Task<IActionResult> List(bool includeProxies = false)
         {
             var result = await _functionsManager.GetFunctionsMetadataAsync(includeProxies, forceRefresh: false);
-            return Ok(result);
+
+            return result is not null && result.Any()
+                ? Ok(result)
+                : NotFound() as IActionResult;
         }
 
         [HttpGet]

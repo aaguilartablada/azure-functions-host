@@ -42,8 +42,15 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
             string uri = "admin/functions?includeProxies=true";
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Headers.Add(AuthenticationLevelHandler.FunctionsKeyHeaderName, "1234");
+
             var response = await _fixture.HttpClient.SendAsync(request);
-            var metadata = (await response.Content.ReadAsAsync<IEnumerable<FunctionMetadataResponse>>()).ToArray();
+            Assert.NotNull(response);
+
+            var metadata = await response.Content.ReadAsAsync<IEnumerable<FunctionMetadataResponse>>();
+            Assert.NotNull(metadata);
+            Assert.True(metadata.Any())
+
+            var metadata = metadata.ToArray();
 
             Assert.Equal(24, metadata.Length);
             var function = metadata.Single(p => p.Name == "PingRoute");
@@ -414,7 +421,7 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
                 var hostProvider = new HostFunctionMetadataProvider(optionsMonitor, NullLogger<HostFunctionMetadataProvider>.Instance, new TestMetricsLogger(), SystemEnvironment.Instance);
                 var provider = new FunctionMetadataProvider(NullLogger<FunctionMetadataProvider>.Instance, null, hostProvider, new OptionsWrapper<FunctionsHostingConfigOptions>(new FunctionsHostingConfigOptions()), SystemEnvironment.Instance);
 
-                TestHost = new TestFunctionHost(HostOptions.ScriptPath, HostOptions.LogPath,
+                TestHost = new TestFunctionHost(HostOptions.ScriptPath, HostOptions.LogPath, HostOptions.TestDataPath,
                     configureScriptHostServices: services =>
                     {
                         services.Replace(new ServiceDescriptor(typeof(IOptions<ScriptApplicationHostOptions>), new OptionsWrapper<ScriptApplicationHostOptions>(HostOptions)));
