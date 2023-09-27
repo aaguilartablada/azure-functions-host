@@ -372,7 +372,7 @@ jobs:
     inputs:
       command: 'test'
       testRunTitle: 'Non-E2E integration tests'
-      arguments: '--filter "Category!=E2E"'
+      arguments: '--verbosity detailed --filter "Category!=E2E"'
       projects: |
         **\WebJobs.Script.Tests.Integration.csproj
     env:
