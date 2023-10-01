@@ -3,8 +3,8 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <MajorVersion>5</MajorVersion>
-    <MinorVersion>0</MinorVersion>
+    <MajorVersion>4</MajorVersion>
+    <MinorVersion>28</MinorVersion>
     <PatchVersion>0</PatchVersion>
     <BuildNumber Condition="'$(BuildNumber)' == '' ">0</BuildNumber>
     <PreviewVersion></PreviewVersion>        
