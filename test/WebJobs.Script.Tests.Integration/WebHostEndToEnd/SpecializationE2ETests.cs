@@ -816,6 +816,7 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
             var runningProcess = Process.GetProcessById(placeholderChannel.WorkerProcess.Id);
             Assert.Contains(runningProcess.ProcessName, "FunctionsNetHost");
 
+            _environment.SetEnvironmentVariable(EnvironmentSettingNames.AzureWebsiteRunFromPackage, "1");
             _environment.SetEnvironmentVariable(EnvironmentSettingNames.AzureWebsiteContainerReady, "1");
             _environment.SetEnvironmentVariable(EnvironmentSettingNames.AzureWebsitePlaceholderMode, "0");
 
@@ -861,6 +862,7 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
             // This has to be on the actual environment in order to propagate to worker
             using var proxyEnv = new TestScopedEnvironmentVariable("UseProxyInTest", "1");
 
+            _environment.SetEnvironmentVariable(EnvironmentSettingNames.AzureWebsiteRunFromPackage, "1");
             _environment.SetEnvironmentVariable(EnvironmentSettingNames.AzureWebsiteContainerReady, "1");
             _environment.SetEnvironmentVariable(EnvironmentSettingNames.AzureWebsitePlaceholderMode, "0");
 
@@ -914,12 +916,29 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
         }
 
         [Fact]
+        public async Task DotNetIsolated_PlaceholderMiss_IsReadOnly()
+        {
+            // We only specialize when host process is 64 bit process.
+            await DotNetIsolatedPlaceholderMiss(() =>
+            {
+                _environment.SetEnvironmentVariable(EnvironmentSettingNames.AzureWebsiteUsePlaceholderDotNetIsolated, "1");
+                _environment.SetEnvironmentVariable(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName, "6.0");
+            });
+
+            var log = _loggerProvider.GetLog();
+            Assert.Contains("UsePlaceholderDotNetIsolated: True", log);
+            Assert.Contains("IsFileSystemReadOnly: True", log);
+            Assert.Contains("Shutting down placeholder worker. Worker is not compatible for runtime: dotnet-isolated", log);
+        }
+
+        [Fact]
         public async Task DotNetIsolated_PlaceholderMiss_DotNetVer()
         {
             // Even with placeholders enabled via the WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED env var,
             // if the dotnet version does not match, we should not use the placeholder
             await DotNetIsolatedPlaceholderMiss(() =>
             {
+                _environment.SetEnvironmentVariable(EnvironmentSettingNames.AzureWebsiteRunFromPackage, "1");
                 _environment.SetEnvironmentVariable(EnvironmentSettingNames.AzureWebsiteUsePlaceholderDotNetIsolated, "1");
                 _environment.SetEnvironmentVariable(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName, "7.0");
             });
