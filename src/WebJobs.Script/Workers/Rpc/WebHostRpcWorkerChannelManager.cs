@@ -190,11 +190,17 @@ namespace Microsoft.Azure.WebJobs.Script.Workers.Rpc
                     return false;
                 }
 
-                if (!_applicationHostOptions.CurrentValue.IsFileSystemReadOnly)
-                {
-                    _logger.LogDebug("IsFileSystemReadOnly: {isValidPayloadPresent}", bool.TrueString);
-                    return false;
-                }
+                var a = _environment.GetEnvironmentVariable("WEBSITE_RUN_FROM_PACKAGE");
+                var b = Utility.IsValidZipSetting(a);
+                var c = _applicationHostOptions.CurrentValue.IsFileSystemReadOnly;
+
+                _logger.LogDebug("IsFileSystemReadOnly: {c},{a},{b}");
+
+                //if (!_applicationHostOptions.CurrentValue.IsFileSystemReadOnly)
+                //{
+                //    _logger.LogDebug("IsFileSystemReadOnly: {isValidPayloadPresent}", bool.TrueString);
+                //    return false;
+                //}
 
                 // Do not specialize if the placeholder is 6.0 but the site is 7.0 (for example).
                 var currentWorkerRuntimeVersion = _environment.GetEnvironmentVariable(RpcWorkerConstants.FunctionWorkerRuntimeVersionSettingName);
