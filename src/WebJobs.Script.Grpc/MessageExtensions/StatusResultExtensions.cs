@@ -11,12 +11,12 @@ namespace Microsoft.Azure.WebJobs.Script.Grpc
 {
     internal static class StatusResultExtensions
     {
-        public static bool IsFailure(this StatusResult statusResult, out Exception exception)
+        public static bool IsFailure(this StatusResult statusResult, bool enableUserCodeExceptionCapability, out Exception exception)
         {
             switch (statusResult.Status)
             {
                 case StatusResult.Types.Status.Failure:
-                    exception = GetRpcException(statusResult);
+                    exception = GetRpcException(statusResult, enableUserCodeExceptionCapability);
                     return true;
 
                 case StatusResult.Types.Status.Cancelled:
@@ -27,6 +27,11 @@ namespace Microsoft.Azure.WebJobs.Script.Grpc
                     exception = null;
                     return false;
             }
+        }
+
+        public static bool IsFailure(this StatusResult statusResult, out Exception exception)
+        {
+            return IsFailure(statusResult, false, out exception);
         }
 
         /// <summary>
