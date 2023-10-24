@@ -24,6 +24,7 @@ namespace Microsoft.Azure.WebJobs.Script.Grpc
     {
         private static readonly JsonSerializerSettings _datetimeSerializerSettings = new JsonSerializerSettings { DateParseHandling = DateParseHandling.None };
         private static readonly TypedData EmptyRpcHttp = new() { Http = new() };
+        private static readonly System.Text.Json.JsonSerializerOptions _serializerOptions = new System.Text.Json.JsonSerializerOptions { WriteIndented = false, PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase };
 
         public static object ToObject(this TypedData typedData) =>
             typedData.DataCase switch
@@ -291,7 +292,8 @@ namespace Microsoft.Azure.WebJobs.Script.Grpc
             TypedData typedData = new TypedData();
             try
             {
-                typedData.Json = JsonConvert.SerializeObject(value, Formatting.None);
+                typedData.Json = System.Text.Json.JsonSerializer.Serialize(value, _serializerOptions);
+                //typedData.Json = JsonConvert.SerializeObject(value, Formatting.None);
             }
             catch
             {
