@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs.Script.Binding;
 using Microsoft.Azure.WebJobs.Script.Description;
@@ -48,7 +49,7 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
             scriptHost.InitializeAsync().GetAwaiter().GetResult();
 
             var config = _host.Services.GetService<IOptions<ScriptJobHostOptions>>().Value;
-            var providers = _host.Services.GetService<ICollection<IScriptBindingProvider>>();
+            var providers = _host.Services.GetService<IEnumerable<IScriptBindingProvider>>().ToArray();
 
             _provider = new TestWorkerDescriptorProvider(scriptHost, config, providers, mockFunctionInvocationDispatcher.Object,
                                 NullLoggerFactory.Instance, mockApplicationLifetime.Object, TimeSpan.FromSeconds(5));
