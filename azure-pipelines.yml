@@ -330,8 +330,6 @@ jobs:
       testRunTitle: 'Unit Tests'
       arguments: '-v n'
       projects: |
-        **\ExtensionsMetadataGeneratorTests.csproj
-        **\WebJobs.Script.Scaling.Tests.csproj
         **\WebJobs.Script.Tests.csproj
 
 - job: RunNonE2EIntegrationTests
