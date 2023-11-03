@@ -405,6 +405,7 @@ namespace Microsoft.Azure.WebJobs.Script
             {
                 builder.AddApplicationInsightsWebJobs(o =>
                 {
+                    o.DiagnosticsEventListenerLogLevel = context.Configuration[EnvironmentSettingNames.AppInsightsEventListener];
                     o.InstrumentationKey = appInsightsInstrumentationKey;
                     o.ConnectionString = appInsightsConnectionString;
                 }, t =>
