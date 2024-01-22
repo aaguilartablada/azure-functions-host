@@ -464,7 +464,7 @@ jobs:
     inputs:
       command: 'test'
       testRunTitle: "C# end to end tests"
-      arguments: '--filter "Group=CSharpEndToEndTests"'
+      arguments: '--filter "Group=CSharpEndToEndTests" --logger "console;verbosity=detailed"'
       projects: |
         **\WebJobs.Script.Tests.Integration.csproj
   - task: DotNetCoreCLI@2
@@ -527,7 +527,7 @@ jobs:
     inputs:
       command: 'test'
       testRunTitle: "Samples end to end tests"
-      arguments: '--filter "Group=SamplesEndToEndTests" --no-build'
+      arguments: '--filter "Group=SamplesEndToEndTests" --no-build --logger "console;verbosity=detailed"'
       projects: |
         **\WebJobs.Script.Tests.Integration.csproj
   - task: DotNetCoreCLI@2
@@ -545,7 +545,7 @@ jobs:
     inputs:
       command: 'test'
       testRunTitle: "Standby mode end to end tests Windows"
-      arguments: '--filter "Group=StandbyModeEndToEndTests_Windows" --no-build'
+      arguments: '--filter "Group=StandbyModeEndToEndTests_Windows" --no-build --logger "console;verbosity=detailed"'
       projects: |
         **\WebJobs.Script.Tests.Integration.csproj
   - task: DotNetCoreCLI@2
