@@ -488,6 +488,19 @@ namespace Microsoft.Azure.WebJobs.Script.Tests
                 {
                     c.AddConfiguration(webHostConfiguration);
                 })
+                 .ConfigureAppConfiguration(c =>
+                 {
+                     // These are used internally inside Hosting.
+                     // Our tests have strict mock enabled.
+                     var settings = new Dictionary<string, string>
+                     {
+                         ["shutdownTimeoutSeconds"] = "1",
+                         ["startupTimeoutSeconds"] = "1",
+                         ["servicesStartConcurrently"] = true.ToString(),
+                         ["servicesStopConcurrently"] = true.ToString(),
+                     };
+                     c.AddInMemoryCollection(settings);
+                 })
                 .Build();
 
             var azureBlobStorageProvider = tempHost.Services.GetRequiredService<IAzureBlobStorageProvider>();
