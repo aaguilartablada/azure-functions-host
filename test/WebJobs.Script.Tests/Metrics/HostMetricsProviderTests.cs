@@ -43,7 +43,7 @@ namespace Microsoft.Azure.WebJobs.Script.Tests.Metrics
         }
 
         [Fact]
-        public void GetHostMetricsOrNull_MetricsCaptured_ReturnsHostMetrics()
+        public void GetHostMetrics_MetricsCaptured_ReturnsHostMetricsDictionary()
         {
             // Arrange
             var metrics = _serviceProvider.GetRequiredService<IHostMetrics>();
@@ -54,7 +54,7 @@ namespace Microsoft.Azure.WebJobs.Script.Tests.Metrics
             metrics.AppFailure();
 
             // Assert
-            var result = _hostMetricsProvider.GetHostMetricsOrNull();
+            var result = _hostMetricsProvider.GetHostMetrics();
             result.TryGetValue(HostMetrics.StartedInvocationCount, out var startedInvocationCount);
             result.TryGetValue(HostMetrics.AppFailureCount, out var appFailureCount);
             Assert.Equal(1, startedInvocationCount);
@@ -62,18 +62,7 @@ namespace Microsoft.Azure.WebJobs.Script.Tests.Metrics
         }
 
         [Fact]
-        public void GetHostMetricsOrNull_NoMetricsCaptured_ReturnsNull()
-        {
-            // Arrange
-            var metrics = _serviceProvider.GetRequiredService<IHostMetrics>();
-
-            // Assert
-            var result = _hostMetricsProvider.GetHostMetricsOrNull();
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public void GetHostMetricsOrNull_PurgesMetricsCache()
+        public void GetHostMetrics_PurgesMetricsCache()
         {
             // Arrange
             var metrics = _serviceProvider.GetRequiredService<IHostMetrics>();
@@ -83,7 +72,7 @@ namespace Microsoft.Azure.WebJobs.Script.Tests.Metrics
 
             // Assert
             Assert.True(_hostMetricsProvider.HasMetrics());
-            _hostMetricsProvider.GetHostMetricsOrNull();
+            _hostMetricsProvider.GetHostMetrics();
             Assert.False(_hostMetricsProvider.HasMetrics());
         }
 

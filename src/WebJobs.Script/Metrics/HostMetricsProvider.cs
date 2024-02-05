@@ -31,6 +31,8 @@ namespace Microsoft.Azure.WebJobs.Script.Metrics
 
         public string InstanceId { get; private set; } = string.Empty;
 
+        public long TotalStartedInvocationCount { get; private set; } = 0;
+
         public void Start()
         {
             _meterListener.InstrumentPublished = (instrument, listener) =>
@@ -61,6 +63,11 @@ namespace Microsoft.Azure.WebJobs.Script.Metrics
                 throw new ArgumentNullException(nameof(instrument));
             }
 
+            if (instrument.Name == HostMetrics.StartedInvocationCount)
+            {
+                TotalStartedInvocationCount += measurement;
+            }
+
             AddOrUpdateMetricsCache(instrument.Name, measurement);
         }
 
@@ -86,13 +93,8 @@ namespace Microsoft.Azure.WebJobs.Script.Metrics
                 });
         }
 
-        public IReadOnlyDictionary<string, long>? GetHostMetricsOrNull()
+        public IReadOnlyDictionary<string, long> GetHostMetrics()
         {
-            if (!HasMetrics())
-            {
-                return null;
-            }
-
             try
             {
                 var functionActivityStatusProvider = _serviceProvider.GetScriptHostServiceOrNull<IFunctionActivityStatusProvider>();

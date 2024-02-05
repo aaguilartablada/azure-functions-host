@@ -25,9 +25,14 @@ namespace Microsoft.Azure.WebJobs.Script.Metrics
         public string FunctionGroup { get; }
 
         /// <summary>
-        /// Retrieves a dictionary of available metrics, or null.
+        /// Gets the total number of started invocations for host lifetime.
         /// </summary>
-        public IReadOnlyDictionary<string, long>? GetHostMetricsOrNull();
+        public long TotalStartedInvocationCount { get; }
+
+        /// <summary>
+        /// Retrieves a dictionary of available metrics.
+        /// </summary>
+        public IReadOnlyDictionary<string, long> GetHostMetrics();
 
         /// <summary>
         /// Determines whether the provider has any host metrics.

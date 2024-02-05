@@ -106,6 +106,7 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Metrics
                 Metrics metrics = null;
                 lock (_lock)
                 {
+                    var scaleMetrics = _metricsProvider.GetHostMetrics();
                     metrics = new Metrics
                     {
                         TotalTimeMS = (long)_intervalStopwatch.GetElapsedTime().TotalMilliseconds,
@@ -113,16 +114,11 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost.Metrics
                         ExecutionTimeMS = FunctionExecutionTimeMS,
                         IsAlwaysReady = IsAlwaysReady,
                         InstanceId = _metricsProvider.InstanceId,
-                        FunctionGroup = _metricsProvider.FunctionGroup
+                        FunctionGroup = _metricsProvider.FunctionGroup,
+                        StartedInvocationCount = _metricsProvider.TotalStartedInvocationCount,
+                        AppFailureCount = scaleMetrics.TryGetValue(HostMetrics.AppFailureCount, out long appFailureCount) ? appFailureCount : 0,
+                        ActiveInvocationCount = scaleMetrics.TryGetValue(HostMetrics.ActiveInvocationCount, out long activeInvocationCount) ? activeInvocationCount : 0,
                     };
-
-                    var scaleMetrics = _metricsProvider.GetHostMetricsOrNull();
-                    if (scaleMetrics is not null)
-                    {
-                        metrics.AppFailureCount = scaleMetrics.TryGetValue(HostMetrics.AppFailureCount, out long appFailureCount) ? appFailureCount : 0;
-                        metrics.StartedInvocationCount = scaleMetrics.TryGetValue(HostMetrics.StartedInvocationCount, out long startedInvocationCount) ? startedInvocationCount : 0;
-                        metrics.ActiveInvocationCount = scaleMetrics.TryGetValue(HostMetrics.ActiveInvocationCount, out long activeInvocationCount) ? activeInvocationCount : 0;
-                    }
 
                     FunctionExecutionTimeMS = FunctionExecutionCount = 0;
                 }
