@@ -181,6 +181,8 @@ namespace Microsoft.Azure.WebJobs.Script
                 Errors = _functionErrors.Where(kvp => functionsAllowList.Any(functionName => functionName.Equals(kvp.Key, StringComparison.CurrentCultureIgnoreCase))).ToImmutableDictionary(kvp => kvp.Key, kvp => kvp.Value.ToImmutableArray());
             }
 
+            _logger.LogInformation("Worker configs: {workerConfigs}. immutableFunctionMetadata: {immutableFunctionMetadata}. functionMetadataList: {functionMetadataList}", workerConfigs, immutableFunctionMetadata, functionMetadataList);
+
             return functionMetadataList.OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase).ToImmutableArray();
         }
 
