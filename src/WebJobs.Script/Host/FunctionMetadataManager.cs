@@ -180,8 +180,9 @@ namespace Microsoft.Azure.WebJobs.Script
                 _logger.LogInformation($"A function allow list has been specified, excluding all but the following functions: [{string.Join(", ", functionsAllowList)}]");
                 Errors = _functionErrors.Where(kvp => functionsAllowList.Any(functionName => functionName.Equals(kvp.Key, StringComparison.CurrentCultureIgnoreCase))).ToImmutableDictionary(kvp => kvp.Key, kvp => kvp.Value.ToImmutableArray());
             }
+            Console.WriteLine($"Worker configs: {workerConfigs}. immutableFunctionMetadata: {immutableFunctionMetadata}. functionMetadataList: {functionMetadataList}");
 
-            _logger.LogInformation("Worker configs: {workerConfigs}. immutableFunctionMetadata: {immutableFunctionMetadata}. functionMetadataList: {functionMetadataList}", workerConfigs, immutableFunctionMetadata, functionMetadataList);
+            _logger.LogInformation($"Worker configs: {workerConfigs}. immutableFunctionMetadata: {immutableFunctionMetadata}. functionMetadataList: {functionMetadataList}");
 
             return functionMetadataList.OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase).ToImmutableArray();
         }
