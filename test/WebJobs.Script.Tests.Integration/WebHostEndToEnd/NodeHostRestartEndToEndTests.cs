@@ -102,6 +102,17 @@ public class NodeHostRestartEndToEndTests
 
         protected override Task CreateTestStorageEntities() => Task.CompletedTask;
 
+        public override void ConfigureWebHost(IServiceCollection services)
+        {
+            base.ConfigureWebHost(services);
+
+            var testEnvironment = new TestEnvironment();
+            testEnvironment.SetEnvironmentVariable(EnvironmentSettingNames.InitializedFromPlaceholder, bool.TrueString);
+            testEnvironment.SetEnvironmentVariable(EnvironmentSettingNames.FunctionWorkerRuntime, "node");
+
+            services.AddSingleton<IEnvironment>(testEnvironment);
+        }
+
         public override void ConfigureScriptHost(IWebJobsBuilder webJobsBuilder)
         {
             base.ConfigureScriptHost(webJobsBuilder);
