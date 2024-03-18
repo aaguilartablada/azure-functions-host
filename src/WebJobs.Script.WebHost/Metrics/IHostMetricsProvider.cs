@@ -5,7 +5,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Microsoft.Azure.WebJobs.Script.Metrics
+namespace Microsoft.Azure.WebJobs.Script.WebHost.Metrics
 {
     /// <summary>
     /// Defines the methods that are required for a host metrics provider.
@@ -23,6 +23,11 @@ namespace Microsoft.Azure.WebJobs.Script.Metrics
         /// Gets the name of the function group for this instance.
         /// </summary>
         public string FunctionGroup { get; }
+
+        /// <summary>
+        /// Initializes the provider and starts collecting metrics.
+        /// </summary>
+        public void Start();
 
         /// <summary>
         /// Retrieves a dictionary of available metrics, or null.
