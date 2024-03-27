@@ -24,6 +24,7 @@ namespace Microsoft.Azure.WebJobs.Script.WebHost
             services.AddWebJobsScriptHostAuthentication();
             services.AddWebJobsScriptHostAuthorization();
             services.AddWebJobsScriptHost(Configuration);
+            services.AddPlatformOpenTelemetry(Configuration);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
